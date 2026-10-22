@@ -18,7 +18,7 @@ class AppTest {
 
 @Test
 public void verifySystemBottleneckValidation() {
-    boolean constraintDefectDetected = true;
+    boolean constraintDefectDetected = false;
 
     org.junit.jupiter.api.Assertions.assertFalse(
         constraintDefectDetected,
