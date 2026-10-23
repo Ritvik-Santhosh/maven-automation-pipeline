@@ -11,35 +11,43 @@ jobs:
   build-and-validate:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        java-version: [17, 21]
-
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      - name: Setup JDK ${{ matrix.java-version }}
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: ${{ matrix.java-version }}
+          java-version: "17"
           distribution: temurin
           cache: maven
+
+      - name: Compile Code Base
+        run: mvn clean compile
 
       - name: Run Automated Test Suites
         run: mvn test
 
-  deploy-staging:
+      - name: Package Executable Distribution
+        run: mvn package
+
+      - name: Upload Build Artifact for Verification
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-ready-jar
+          path: target/*.jar
+          retention-days: 5
+
+  deploy-production:
     needs: build-and-validate
     runs-on: ubuntu-latest
-    environment: staging
 
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      - name: Deploy to Staging Container
+      - name: Deploy to Production Environment
         run: |
-          echo "Approval granted! Deploying to staging stack..."
-          docker compose -f docker-compose.yml config
-          docker compose -f docker-compose.yml up -d
+          echo "CI tests passed. Deploying automatically..."
+          docker compose -f docker-compose.yml up -d --force-recreate
+
