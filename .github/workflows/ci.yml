@@ -41,5 +41,5 @@ jobs:
       - name: Deploy to Staging Container
         run: |
           echo "Approval granted! Deploying to staging stack..."
-          docker compose up -d
-
+          docker compose -f docker-compose.yml config
+          docker compose -f docker-compose.yml up -d
